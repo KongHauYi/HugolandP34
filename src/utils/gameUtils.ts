@@ -1,4 +1,4 @@
-import { Weapon, Armor, Enemy, RelicItem } from '../types/game';
+import { Weapon, Armor, Enemy } from '../types/game';
 import { getColorblindRarityClass, getRaritySymbol } from './colorblindUtils';
 
 const weaponNames = {
@@ -15,29 +15,6 @@ const armorNames = {
   epic: ['Dragon Scale', 'Phoenix Mail', 'Void Armor', 'Crystal Guard'],
   legendary: ['Divine Aegis', 'Eternal Plate', 'Shadowweave', 'Celestial Ward'],
   mythical: ['Abyssal Aegis', 'Stellar Fortress', 'Quantum Shield', 'Infinity Guard', 'Void Mantle', 'Cosmic Barrier', 'Reality Armor', 'Dimensional Cloak'],
-};
-
-const relicNames = {
-  weapons: [
-    'Ancient Blade of Yojef',
-    'Primordial Sword',
-    'Relic of the First War',
-    'Eternal Flame Sword',
-    'Void Touched Blade',
-    'Starfall Weapon',
-    'Temporal Slicer',
-    'Reality Breaker'
-  ],
-  armor: [
-    'Guardian\'s Ancient Shield',
-    'Primordial Armor',
-    'Relic of Protection',
-    'Eternal Barrier',
-    'Void Touched Guard',
-    'Starfall Aegis',
-    'Temporal Ward',
-    'Reality Defender'
-  ]
 };
 
 const enemyNames = [
@@ -169,38 +146,6 @@ export const generateArmor = (forceChroma = false, forceRarity?: string, forceEn
     isEnchanted,
     enchantmentMultiplier,
   };
-};
-
-export const generateRelicItem = (): RelicItem => {
-  const isWeapon = Math.random() < 0.5;
-  const names = isWeapon ? relicNames.weapons : relicNames.armor;
-  const name = names[Math.floor(Math.random() * names.length)];
-  
-  if (isWeapon) {
-    const baseAtk = 120 + Math.floor(Math.random() * 60);
-    return {
-      id: Math.random().toString(36).substr(2, 9),
-      name,
-      type: 'weapon',
-      baseAtk,
-      level: 1,
-      upgradeCost: 25,
-      cost: baseAtk * 5,
-      description: 'A powerful relic weapon from ancient times'
-    };
-  } else {
-    const baseDef = 90 + Math.floor(Math.random() * 45);
-    return {
-      id: Math.random().toString(36).substr(2, 9),
-      name,
-      type: 'armor',
-      baseDef,
-      level: 1,
-      upgradeCost: 25,
-      cost: baseDef * 5,
-      description: 'A powerful relic armor from ancient times'
-    };
-  }
 };
 
 export const generateMythicalWeapon = (): Weapon => {
