@@ -23,11 +23,9 @@ import {
   LazyOfflineProgress,
   LazyBulkActions,
   LazyHamburgerMenuPage,
-  LazyGardenOfGrowth,
   LazyGameSettings,
   LazyDevTools,
   LazySkills,
-  LazyYojefMarket,
   LazyProgressionPanel,
   LazyAdventureSkillSelection
 } from './components/LazyComponents';
@@ -66,19 +64,12 @@ function App() {
     mineGem,
     exchangeShinyGems,
     discardItem,
-    purchaseRelic,
-    upgradeRelic,
-    equipRelic,
-    unequipRelic,
-    sellRelic,
     claimDailyReward,
     upgradeSkill,
     prestige,
     claimOfflineRewards,
     bulkSell,
     bulkUpgrade,
-    plantSeed,
-    buyWater,
     updateSettings,
     addCoins,
     addGems,
@@ -88,6 +79,8 @@ function App() {
     selectAdventureSkill,
     skipAdventureSkills,
     useSkipCard,
+    purchaseAuctionItem,
+    listAuctionItem,
   } = useGameState();
 
   const [currentView, setCurrentView] = useState<GameView>('stats');
@@ -271,8 +264,6 @@ function App() {
           <Suspense fallback={<LoadingSpinner />}>
             <LazyHamburgerMenuPage
               gameState={gameState}
-              onPlantSeed={plantSeed}
-              onBuyWater={buyWater}
               onUpgradeSkill={upgradeSkill}
               onPrestige={prestige}
               onUpdateSettings={updateSettings}
@@ -281,7 +272,8 @@ function App() {
               onTeleportToZone={teleportToZone}
               onSetExperience={setExperience}
               onRollSkill={rollSkill}
-              onPurchaseRelic={purchaseRelic}
+              onPurchaseAuctionItem={purchaseAuctionItem}
+              onListAuctionItem={listAuctionItem}
               onBack={() => setCurrentView('stats')}
             />
           </Suspense>
@@ -298,44 +290,6 @@ function App() {
               playerTags={gameState.playerTags}
               progression={gameState.progression}
             />
-
-            {/* Garden Status */}
-            {gameState.gardenOfGrowth.isPlanted && (
-              <div className="bg-gradient-to-r from-green-900/50 to-emerald-900/50 p-4 sm:p-6 rounded-xl border border-green-500/50 backdrop-blur-sm">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-white font-bold text-base sm:text-lg flex items-center gap-2">
-                    <span className="text-xl sm:text-2xl">🌱</span>
-                    Garden of Growth
-                  </h3>
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
-                  <div className="text-center bg-black/20 p-3 rounded-lg">
-                    <p className="text-green-300 font-semibold text-sm">Growth</p>
-                    <p className="text-white text-lg sm:text-xl font-bold">{gameState.gardenOfGrowth.growthCm.toFixed(1)}cm</p>
-                  </div>
-                  <div className="text-center bg-black/20 p-3 rounded-lg">
-                    <p className="text-blue-300 font-semibold text-sm">Stat Bonus</p>
-                    <p className="text-white text-lg sm:text-xl font-bold">+{gameState.gardenOfGrowth.totalGrowthBonus.toFixed(1)}%</p>
-                  </div>
-                  <div className="text-center bg-black/20 p-3 rounded-lg">
-                    <p className="text-cyan-300 font-semibold text-sm">Water Left</p>
-                    <p className="text-white text-lg sm:text-xl font-bold">{gameState.gardenOfGrowth.waterHoursRemaining.toFixed(1)}h</p>
-                  </div>
-                </div>
-                
-                <div className="mt-4">
-                  <div className="w-full bg-gray-700 rounded-full h-3">
-                    <div 
-                      className="bg-gradient-to-r from-green-500 to-emerald-500 h-3 rounded-full transition-all duration-500"
-                      style={{ width: `${Math.min((gameState.gardenOfGrowth.growthCm / gameState.gardenOfGrowth.maxGrowthCm) * 100, 100)}%` }}
-                    />
-                  </div>
-                  <p className="text-center text-gray-300 text-xs sm:text-sm mt-2">
-                    Progress to maximum growth ({gameState.gardenOfGrowth.maxGrowthCm}cm)
-                  </p>
-                </div>
-              </div>
-            )}
             
             {/* Knowledge Streak Display */}
             {gameState.knowledgeStreak.current > 0 && (
@@ -439,10 +393,6 @@ function App() {
             onUpgradeArmor={upgradeArmor}
             onSellWeapon={sellWeapon}
             onSellArmor={sellArmor}
-            onUpgradeRelic={upgradeRelic}
-            onEquipRelic={equipRelic}
-            onUnequipRelic={unequipRelic}
-            onSellRelic={sellRelic}
           />
         );
       case 'mining':

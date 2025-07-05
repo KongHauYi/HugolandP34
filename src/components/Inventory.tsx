@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Inventory as InventoryType, Weapon, Armor, RelicItem } from '../types/game';
+import { Inventory as InventoryType, Weapon, Armor } from '../types/game';
 import { Sword, Shield, Gem, Star, Coins, Sparkles } from 'lucide-react';
 import { getRarityColor, getRarityBorder, getRarityGlow } from '../utils/gameUtils';
 
@@ -12,10 +12,6 @@ interface InventoryProps {
   onUpgradeArmor: (armorId: string) => void;
   onSellWeapon: (weaponId: string) => void;
   onSellArmor: (armorId: string) => void;
-  onUpgradeRelic: (relicId: string) => void;
-  onEquipRelic: (relicId: string) => void;
-  onUnequipRelic: (relicId: string) => void;
-  onSellRelic: (relicId: string) => void;
 }
 
 export const Inventory: React.FC<InventoryProps> = ({
@@ -27,12 +23,8 @@ export const Inventory: React.FC<InventoryProps> = ({
   onUpgradeArmor,
   onSellWeapon,
   onSellArmor,
-  onUpgradeRelic,
-  onEquipRelic,
-  onUnequipRelic,
-  onSellRelic,
 }) => {
-  const [activeTab, setActiveTab] = useState<'weapons' | 'armor' | 'relics'>('weapons');
+  const [activeTab, setActiveTab] = useState<'weapons' | 'armor'>('weapons');
 
   const getDurabilityColor = (durability: number, maxDurability: number) => {
     const percentage = durability / maxDurability;
@@ -232,107 +224,6 @@ export const Inventory: React.FC<InventoryProps> = ({
     </div>
   );
 
-  const renderRelicGrid = () => (
-    <div className="space-y-4">
-      {/* Equipped Relics */}
-      <div>
-        <h3 className="text-white font-semibold mb-3 flex items-center gap-2 text-sm sm:text-base">
-          <Shield className="w-4 h-4 sm:w-5 sm:h-5 text-indigo-400" />
-          Equipped Relics ({inventory.equippedRelics.length}/5)
-        </h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-4">
-          {inventory.equippedRelics.map((relic) => (
-            <div key={relic.id} className="bg-gradient-to-br from-indigo-900/50 to-purple-900/50 p-3 sm:p-4 rounded-lg border-2 border-indigo-500/50">
-              <div className="flex items-center gap-2 mb-2">
-                {relic.type === 'weapon' ? (
-                  <Sword className="w-4 h-4 text-orange-400" />
-                ) : (
-                  <Shield className="w-4 h-4 text-blue-400" />
-                )}
-                <h4 className="text-white font-bold text-sm">{relic.name}</h4>
-              </div>
-              <p className="text-gray-300 text-xs mb-2">{relic.description}</p>
-              <p className="text-white text-sm mb-2">
-                {relic.type === 'weapon' ? `ATK: ${relic.baseAtk! + (relic.level - 1) * 22}` : `DEF: ${relic.baseDef! + (relic.level - 1) * 15}`}
-              </p>
-              <p className="text-gray-300 text-xs mb-3">Level {relic.level}</p>
-              
-              <div className="flex gap-2">
-                <button
-                  onClick={() => onUpgradeRelic(relic.id)}
-                  disabled={gems < relic.upgradeCost}
-                  className={`flex-1 px-2 py-1 text-xs rounded font-semibold transition-all flex items-center gap-1 justify-center ${
-                    gems >= relic.upgradeCost
-                      ? 'bg-purple-600 text-white hover:bg-purple-500'
-                      : 'bg-gray-600 text-gray-400 cursor-not-allowed'
-                  }`}
-                >
-                  <Gem className="w-3 h-3" />
-                  {relic.upgradeCost}
-                </button>
-                <button
-                  onClick={() => onUnequipRelic(relic.id)}
-                  className="flex-1 px-2 py-1 text-xs rounded font-semibold bg-red-600 text-white hover:bg-red-500 transition-all"
-                >
-                  Unequip
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Unequipped Relics */}
-      {inventory.relics.filter(r => !inventory.equippedRelics.some(er => er.id === r.id)).length > 0 && (
-        <div>
-          <h3 className="text-white font-semibold mb-3 flex items-center gap-2 text-sm sm:text-base">
-            <Shield className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400" />
-            Unequipped Relics
-          </h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-4">
-            {inventory.relics.filter(r => !inventory.equippedRelics.some(er => er.id === r.id)).map((relic) => (
-              <div key={relic.id} className="bg-black/40 p-3 sm:p-4 rounded-lg border border-gray-600">
-                <div className="flex items-center gap-2 mb-2">
-                  {relic.type === 'weapon' ? (
-                    <Sword className="w-4 h-4 text-orange-400" />
-                  ) : (
-                    <Shield className="w-4 h-4 text-blue-400" />
-                  )}
-                  <h4 className="text-white font-bold text-sm">{relic.name}</h4>
-                </div>
-                <p className="text-gray-300 text-xs mb-2">{relic.description}</p>
-                <p className="text-white text-sm mb-2">
-                  {relic.type === 'weapon' ? `ATK: ${relic.baseAtk! + (relic.level - 1) * 22}` : `DEF: ${relic.baseDef! + (relic.level - 1) * 15}`}
-                </p>
-                <p className="text-gray-300 text-xs mb-3">Level {relic.level}</p>
-                
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => onEquipRelic(relic.id)}
-                    disabled={inventory.equippedRelics.length >= 5}
-                    className={`flex-1 px-2 py-1 text-xs rounded font-semibold transition-all ${
-                      inventory.equippedRelics.length < 5
-                        ? 'bg-indigo-600 text-white hover:bg-indigo-500'
-                        : 'bg-gray-600 text-gray-400 cursor-not-allowed'
-                    }`}
-                  >
-                    {inventory.equippedRelics.length >= 5 ? 'Limit Reached' : 'Equip'}
-                  </button>
-                  <button
-                    onClick={() => onSellRelic(relic.id)}
-                    className="flex-1 px-2 py-1 text-xs rounded font-semibold bg-red-600 text-white hover:bg-red-500 transition-all"
-                  >
-                    Destroy
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-    </div>
-  );
-
   return (
     <div className="bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900 p-4 sm:p-6 rounded-lg shadow-2xl">
       <div className="text-center mb-4 sm:mb-6">
@@ -350,8 +241,7 @@ export const Inventory: React.FC<InventoryProps> = ({
       <div className="flex gap-2 mb-4">
         {[
           { key: 'weapons', label: 'Weapons', count: inventory.weapons.length, icon: Sword },
-          { key: 'armor', label: 'Armor', count: inventory.armor.length, icon: Shield },
-          { key: 'relics', label: 'Relics', count: inventory.relics.length, icon: Shield }
+          { key: 'armor', label: 'Armor', count: inventory.armor.length, icon: Shield }
         ].map(({ key, label, count, icon: Icon }) => (
           <button
             key={key}
@@ -408,24 +298,6 @@ export const Inventory: React.FC<InventoryProps> = ({
         </div>
       )}
 
-      {activeTab === 'relics' && (
-        <div>
-          <h3 className="text-white font-semibold mb-3 flex items-center gap-2 text-sm sm:text-base">
-            <Shield className="w-4 h-4 sm:w-5 sm:h-5 text-indigo-400" />
-            Ancient Relics ({inventory.relics.length})
-          </h3>
-          {inventory.relics.length > 0 ? (
-            renderRelicGrid()
-          ) : (
-            <div className="text-center py-8">
-              <Shield className="w-16 h-16 text-gray-500 mx-auto mb-4" />
-              <p className="text-gray-400 text-lg">No relics found</p>
-              <p className="text-gray-500 text-sm">Visit the Yojef Market to find ancient relics!</p>
-            </div>
-          )}
-        </div>
-      )}
-
       {/* Info */}
       <div className="mt-6 text-center">
         <div className="bg-black/30 p-3 rounded-lg">
@@ -434,8 +306,8 @@ export const Inventory: React.FC<InventoryProps> = ({
           </p>
           <div className="text-xs text-gray-400 space-y-1">
             <p>• <strong>Enchanted Items:</strong> 5% chance from chests, double ATK/DEF</p>
-            <p>• <strong>Relics:</strong> Powerful ancient items from the Yojef Market (max 5 equipped) - 1.5x stronger!</p>
             <p>• <strong>Durability:</strong> Items lose durability in combat and become less effective</p>
+            <p>• <strong>Auction House:</strong> Buy and sell items with other players in the menu!</p>
           </div>
         </div>
       </div>

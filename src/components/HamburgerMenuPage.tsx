@@ -1,19 +1,16 @@
 import React, { useState } from 'react';
-import { Sprout, BarChart3, Trophy, TrendingUp, Settings, ArrowLeft, Code, Zap, Package } from 'lucide-react';
-import { GardenOfGrowth } from './GardenOfGrowth';
+import { Gavel, BarChart3, Trophy, TrendingUp, Settings, ArrowLeft, Code, Zap } from 'lucide-react';
 import { Statistics } from './Statistics';
 import { Achievements } from './Achievements';
 import { ProgressionPanel } from './ProgressionPanel';
 import { GameSettings } from './GameSettings';
 import { DevTools } from './DevTools';
 import { Skills } from './Skills';
-import { YojefMarket } from './YojefMarket';
+import { AuctionHouse } from './AuctionHouse';
 import { GameState, GameSettings as SettingsType } from '../types/game';
 
 interface HamburgerMenuPageProps {
   gameState: GameState;
-  onPlantSeed: () => boolean;
-  onBuyWater: (hours: number) => boolean;
   onUpgradeSkill: (skillId: string) => boolean;
   onPrestige: () => boolean;
   onUpdateSettings: (settings: Partial<SettingsType>) => void;
@@ -22,14 +19,13 @@ interface HamburgerMenuPageProps {
   onTeleportToZone: (zone: number) => void;
   onSetExperience: (xp: number) => void;
   onRollSkill: () => boolean;
-  onPurchaseRelic: (relicId: string) => boolean;
+  onPurchaseAuctionItem: (itemId: string) => boolean;
+  onListAuctionItem: (item: any, price: number) => boolean;
   onBack: () => void;
 }
 
 export const HamburgerMenuPage: React.FC<HamburgerMenuPageProps> = ({
   gameState,
-  onPlantSeed,
-  onBuyWater,
   onUpgradeSkill,
   onPrestige,
   onUpdateSettings,
@@ -38,21 +34,22 @@ export const HamburgerMenuPage: React.FC<HamburgerMenuPageProps> = ({
   onTeleportToZone,
   onSetExperience,
   onRollSkill,
-  onPurchaseRelic,
+  onPurchaseAuctionItem,
+  onListAuctionItem,
   onBack
 }) => {
-  const [activeSection, setActiveSection] = useState<'garden' | 'stats' | 'achievements' | 'progression' | 'settings' | 'devtools' | 'skills' | 'yojef' | null>(null);
+  const [activeSection, setActiveSection] = useState<'auction' | 'stats' | 'achievements' | 'progression' | 'settings' | 'devtools' | 'skills' | null>(null);
 
   const menuItems = [
     {
-      id: 'garden',
-      name: 'Garden of Growth',
-      icon: Sprout,
-      color: 'text-green-400',
-      bgColor: 'from-green-900/50 to-emerald-900/50',
-      borderColor: 'border-green-500/50',
-      description: 'Grow plants for permanent stat bonuses',
-      status: gameState.gardenOfGrowth.isPlanted ? `${gameState.gardenOfGrowth.growthCm.toFixed(1)}cm grown` : 'Not planted'
+      id: 'auction',
+      name: 'Auction House',
+      icon: Gavel,
+      color: 'text-indigo-400',
+      bgColor: 'from-indigo-900/50 to-purple-900/50',
+      borderColor: 'border-indigo-500/50',
+      description: 'Buy and sell items with other players',
+      status: `${gameState.auctionHouse.items.length} items available`
     },
     {
       id: 'skills',
@@ -63,16 +60,6 @@ export const HamburgerMenuPage: React.FC<HamburgerMenuPageProps> = ({
       borderColor: 'border-purple-500/50',
       description: 'Roll for powerful temporary abilities',
       status: gameState.skills?.activeMenuSkill ? `${gameState.skills.activeMenuSkill.name} active` : 'No active skill'
-    },
-    {
-      id: 'yojef',
-      name: 'Yojef Market',
-      icon: Package,
-      color: 'text-indigo-400',
-      bgColor: 'from-indigo-900/50 to-purple-900/50',
-      borderColor: 'border-indigo-500/50',
-      description: 'Ancient relics and artifacts',
-      status: `${gameState.yojefMarket.items.length} relics available`
     },
     {
       id: 'stats',
@@ -128,14 +115,17 @@ export const HamburgerMenuPage: React.FC<HamburgerMenuPageProps> = ({
 
   const renderSection = () => {
     switch (activeSection) {
-      case 'garden':
+      case 'auction':
         return (
-          <GardenOfGrowth
-            garden={gameState.gardenOfGrowth}
+          <AuctionHouse
+            auctionHouse={gameState.auctionHouse}
             coins={gameState.coins}
-            onPlantSeed={onPlantSeed}
-            onBuyWater={onBuyWater}
+            gems={gameState.gems}
+            inventory={gameState.inventory}
+            onPurchaseItem={onPurchaseAuctionItem}
+            onListItem={onListAuctionItem}
             onClose={() => setActiveSection(null)}
+            nextRefresh={gameState.auctionHouse.nextRefresh}
           />
         );
       case 'skills':
@@ -145,17 +135,6 @@ export const HamburgerMenuPage: React.FC<HamburgerMenuPageProps> = ({
             coins={gameState.coins}
             onRollSkill={onRollSkill}
             onClose={() => setActiveSection(null)}
-          />
-        );
-      case 'yojef':
-        return (
-          <YojefMarket
-            relicItems={gameState.yojefMarket.items}
-            gems={gameState.gems}
-            equippedRelicsCount={gameState.inventory.equippedRelics.length}
-            onPurchaseRelic={onPurchaseRelic}
-            onClose={() => setActiveSection(null)}
-            nextRefresh={gameState.yojefMarket.nextRefresh}
           />
         );
       case 'stats':
@@ -242,43 +221,6 @@ export const HamburgerMenuPage: React.FC<HamburgerMenuPageProps> = ({
           );
         })}
       </div>
-
-      {/* Garden Status Preview (if planted) */}
-      {gameState.gardenOfGrowth.isPlanted && (
-        <div className="bg-gradient-to-r from-green-900/30 to-emerald-900/30 p-4 sm:p-6 rounded-lg border border-green-500/30">
-          <div className="flex items-center gap-3 mb-4">
-            <Sprout className="w-5 h-5 sm:w-6 sm:h-6 text-green-400" />
-            <h3 className="text-green-400 font-bold text-base sm:text-lg">🌱 Your Garden</h3>
-          </div>
-          
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
-            <div className="text-center">
-              <p className="text-green-300 font-semibold text-sm">Growth</p>
-              <p className="text-white text-lg sm:text-xl font-bold">{gameState.gardenOfGrowth.growthCm.toFixed(1)}cm</p>
-            </div>
-            <div className="text-center">
-              <p className="text-blue-300 font-semibold text-sm">Stat Bonus</p>
-              <p className="text-white text-lg sm:text-xl font-bold">+{gameState.gardenOfGrowth.totalGrowthBonus.toFixed(1)}%</p>
-            </div>
-            <div className="text-center">
-              <p className="text-cyan-300 font-semibold text-sm">Water Left</p>
-              <p className="text-white text-lg sm:text-xl font-bold">{gameState.gardenOfGrowth.waterHoursRemaining.toFixed(1)}h</p>
-            </div>
-          </div>
-          
-          <div className="mt-4">
-            <div className="w-full bg-gray-700 rounded-full h-3">
-              <div 
-                className="bg-gradient-to-r from-green-500 to-emerald-500 h-3 rounded-full transition-all duration-500"
-                style={{ width: `${Math.min((gameState.gardenOfGrowth.growthCm / gameState.gardenOfGrowth.maxGrowthCm) * 100, 100)}%` }}
-              />
-            </div>
-            <p className="text-center text-gray-300 text-xs sm:text-sm mt-2">
-              Progress to maximum growth ({gameState.gardenOfGrowth.maxGrowthCm}cm)
-            </p>
-          </div>
-        </div>
-      )}
 
       {/* Quick Stats Summary */}
       <div className="bg-black/30 p-4 sm:p-6 rounded-lg border border-gray-600/50">

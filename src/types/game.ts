@@ -17,16 +17,15 @@ export interface GameState {
   statistics: Statistics;
   cheats: CheatSettings;
   mining: Mining;
-  yojefMarket: YojefMarket;
   playerTags: PlayerTag[];
   dailyRewards: DailyRewards;
   progression: ProgressionSystem;
   offlineProgress: OfflineProgress;
-  gardenOfGrowth: GardenOfGrowth;
   settings: GameSettings;
   hasUsedRevival: boolean;
   skills: SkillsSystem;
   adventureSkills: AdventureSkillsState;
+  auctionHouse: AuctionHouse;
 }
 
 export interface PlayerStats {
@@ -48,10 +47,8 @@ export interface Research {
 export interface Inventory {
   weapons: Weapon[];
   armor: Armor[];
-  relics: RelicItem[];
   currentWeapon: Weapon | null;
   currentArmor: Armor | null;
-  equippedRelics: RelicItem[];
 }
 
 export interface Weapon {
@@ -82,18 +79,6 @@ export interface Armor {
   maxDurability: number;
   isEnchanted?: boolean;
   enchantmentMultiplier?: number;
-}
-
-export interface RelicItem {
-  id: string;
-  name: string;
-  type: 'weapon' | 'armor';
-  baseAtk?: number;
-  baseDef?: number;
-  level: number;
-  upgradeCost: number;
-  cost: number;
-  description: string;
 }
 
 export interface Enemy {
@@ -210,12 +195,6 @@ export interface MiningTool {
   owned: boolean;
 }
 
-export interface YojefMarket {
-  items: RelicItem[];
-  lastRefresh: Date;
-  nextRefresh: Date;
-}
-
 export interface PlayerTag {
   id: string;
   name: string;
@@ -265,18 +244,6 @@ export interface OfflineProgress {
   maxOfflineHours: number;
 }
 
-export interface GardenOfGrowth {
-  isPlanted: boolean;
-  plantedAt: Date | null;
-  lastWatered: Date | null;
-  waterHoursRemaining: number;
-  growthCm: number;
-  totalGrowthBonus: number;
-  seedCost: number;
-  waterCost: number;
-  maxGrowthCm: number;
-}
-
 export interface GameSettings {
   colorblindMode: boolean;
   darkMode: boolean;
@@ -300,7 +267,7 @@ export interface MenuSkill {
   duration: number; // in hours
   activatedAt: Date;
   expiresAt: Date;
-  type: 'coin_vacuum' | 'treasurer' | 'xp_surge' | 'luck_gem' | 'enchanter' | 'time_warp' | 'golden_touch' | 'knowledge_boost' | 'durability_master' | 'relic_finder' | 'stat_amplifier' | 'question_master' | 'gem_magnet' | 'streak_guardian' | 'revival_blessing' | 'zone_skipper' | 'item_duplicator' | 'research_accelerator' | 'garden_booster' | 'market_refresh' | 'coin_multiplier' | 'gem_multiplier' | 'xp_multiplier' | 'damage_boost' | 'defense_boost' | 'health_boost' | 'speed_boost' | 'luck_boost' | 'magic_shield' | 'auto_heal';
+  type: 'coin_vacuum' | 'treasurer' | 'xp_surge' | 'luck_gem' | 'enchanter' | 'time_warp' | 'golden_touch' | 'knowledge_boost' | 'durability_master' | 'stat_amplifier' | 'question_master' | 'gem_magnet' | 'streak_guardian' | 'revival_blessing' | 'zone_skipper' | 'item_duplicator' | 'research_accelerator' | 'market_refresh' | 'coin_multiplier' | 'gem_multiplier' | 'xp_multiplier' | 'damage_boost' | 'defense_boost' | 'health_boost' | 'speed_boost' | 'luck_boost' | 'magic_shield' | 'auto_heal';
   isExpired?: boolean;
 }
 
@@ -343,6 +310,22 @@ export interface AdventureSkill {
   name: string;
   description: string;
   type: 'risker' | 'lightning_chain' | 'skip_card' | 'metal_shield' | 'truth_lies' | 'ramp' | 'dodge' | 'berserker' | 'vampiric' | 'phoenix' | 'time_slow' | 'critical_strike' | 'shield_wall' | 'poison_blade' | 'arcane_shield' | 'battle_frenzy' | 'elemental_mastery' | 'shadow_step' | 'healing_aura' | 'double_strike' | 'mana_shield' | 'berserk_rage' | 'divine_protection' | 'storm_call' | 'blood_pact' | 'frost_armor' | 'fireball';
+}
+
+export interface AuctionHouse {
+  items: AuctionItem[];
+  lastRefresh: Date;
+  nextRefresh: Date;
+  playerListings: AuctionItem[];
+}
+
+export interface AuctionItem {
+  id: string;
+  item: Weapon | Armor;
+  price: number;
+  seller: string;
+  timeRemaining: number; // hours
+  listedAt: Date;
 }
 
 export interface TriviaQuestion {
